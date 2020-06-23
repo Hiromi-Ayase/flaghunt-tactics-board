@@ -1,7 +1,7 @@
 {
-  "name": "flaghunt-simulator",
+  "name": "flaghunt-tactics-board",
   "version": "0.0.1",
-  "description": "Flag hunt simulator.",
+  "description": "FLAGHUNT Tactics Board.",
   "main": "index.js",
   "scripts": {
     "build": "webpack --mode=production",
