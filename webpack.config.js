@@ -27,7 +27,7 @@ module.exports = {
     rules: [
       {
         test: /\.ts$/,
-        use: "ts-loader",
+        loader: "ts-loader",
       },
       {
         enforce: "pre",
@@ -36,6 +36,10 @@ module.exports = {
         loader: "eslint-loader",
       },
     ],
+  },
+  devServer: {
+    disableHostCheck: true,
+    host: "0.0.0.0",
   },
   resolve: {
     extensions: [".ts", ".js"],
