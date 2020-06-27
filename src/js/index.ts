@@ -35,10 +35,6 @@ window.addEventListener("DOMContentLoaded", () => {
   const mouse = new THREE.Vector2();
   const raycaster = new THREE.Raycaster();
 
-  const gc = () => {
-    this.bouncingSpeed = 0.03;
-  };
-
   const stats = new Stats();
   stats.setMode(0);
   document.body.appendChild(stats.domElement);
@@ -81,7 +77,6 @@ window.addEventListener("DOMContentLoaded", () => {
       lv = lv == 1 ? 2 : 1;
     }
   }
-
 
   document.addEventListener(
     "mousedown",
