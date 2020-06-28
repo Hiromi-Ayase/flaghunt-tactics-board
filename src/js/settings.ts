@@ -7,6 +7,10 @@ export const settings = {
   player: {
     color: [0xff0000, 0x0000ff],
     size: 4,
+    text: {
+      size: 4,
+      depth: 0.1,
+    },
   },
   box: {
     size: 9.7,

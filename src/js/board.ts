@@ -36,7 +36,7 @@ export default class Board {
    * @param width Board width.
    * @param height Board height.
    */
-  constructor(width = 30, height = 20) {
+  constructor(width = 31, height = 21) {
     this.object = new THREE.Object3D();
     Board.numberGeometry = new Array(100);
     for (let i = 0; i < 100; i++) {

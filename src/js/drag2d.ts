@@ -1,79 +1,128 @@
 import * as THREE from "three";
+import { Draggable } from "./draggable";
 
 export default class Drag2DControl extends THREE.EventDispatcher {
   private readonly raycaster = new THREE.Raycaster();
   private readonly mouse = new THREE.Vector2();
 
-  private target: THREE.Object3D;
+  private type = -1;
+  private target: Draggable;
   private readonly offset = new THREE.Vector3();
   private readonly intersection = new THREE.Vector3();
+  public readonly map: { [id: string]: Draggable } = {};
+  public readonly objects: THREE.Object3D[] = [];
 
   constructor(
-    public objects: THREE.Object3D[],
+    objects: Draggable[],
     public camera: THREE.Camera,
     public domElement: HTMLCanvasElement,
     public plane = new THREE.Plane(new THREE.Vector3(0, 1, 0))
   ) {
     super();
-    document.addEventListener("mousedown", (e) =>
-      this.onDragStart(e.clientX, e.clientY)
-    );
-    document.addEventListener("mousemove", (e) =>
-      this.onDragging(e.clientX, e.clientY)
-    );
-    document.addEventListener("mouseup", () => this.onDragEnd());
-    document.addEventListener("mouseleave", () => this.onDragEnd());
 
-    document.addEventListener("touchstart", (e) => {
+    for (const v of objects) {
+      const obj = v.getObject();
+      this.objects.push(obj);
+      this.map[obj.id] = v;
+    }
+
+    domElement.addEventListener("mousedown", (e) => {
+      const type = e.button == 0 ? 0 : 1;
+      this.onStart(type, e.clientX, e.clientY);
+    });
+    domElement.addEventListener("mousemove", (e) => {
+      if (this.type === 0) {
+        this.onLeftDragging(e.clientX, e.clientY);
+      } else {
+        this.onRightDragging(e.clientX, e.clientY);
+      }
+    });
+    domElement.addEventListener("mouseup", () => this.onEnd());
+    domElement.addEventListener("mouseleave", () => this.onEnd());
+
+    domElement.addEventListener("touchstart", (e) => {
       e.preventDefault();
       const touch = e.changedTouches[0];
-      this.onDragStart(touch.clientX, touch.clientY);
+      this.onStart(0, touch.clientX, touch.clientY);
     });
-    document.addEventListener("touchmove", (e) => {
+    domElement.addEventListener("touchmove", (e) => {
       e.preventDefault();
       const touch = e.changedTouches[0];
-      this.onDragging(touch.clientX, touch.clientY);
+      if (e.changedTouches.length == 1) {
+        this.onLeftDragging(touch.clientX, touch.clientY);
+      } else {
+        this.onRightDragging(touch.clientX, touch.clientY);
+      }
     });
-    document.addEventListener("touchend", (e) => {
+    domElement.addEventListener("touchend", (e) => {
       e.preventDefault();
-      this.onDragEnd();
+      this.onEnd();
     });
   }
 
-  private onDragStart(x: number, y: number): void {
+  private onStart(type: number, x: number, y: number): void {
+    if (this.target !== undefined) {
+      return;
+    }
+
     const rect = this.domElement.getBoundingClientRect();
     this.mouse.x = ((x - rect.left) / rect.width) * 2 - 1;
     this.mouse.y = -((y - rect.top) / rect.height) * 2 + 1;
+    this.type = type;
 
     this.raycaster.setFromCamera(this.mouse, this.camera);
     const intersections = this.raycaster.intersectObjects(this.objects);
 
     if (intersections.length > 0) {
-      this.target = intersections[0].object;
-      this.plane.constant = -this.target.position.y;
+      this.target = this.map[intersections[0].object.id];
+      const position = this.target.getObject().position;
+      this.plane.constant = -position.y;
       if (this.raycaster.ray.intersectPlane(this.plane, this.intersection)) {
-        this.offset.copy(this.intersection).sub(this.target.position);
+        this.offset.copy(this.intersection).sub(position);
         this.dispatchEvent({ type: "activate", object: this.target });
       }
     }
   }
 
-  private onDragging(x: number, y: number): void {
+  private onRightDragging(x: number, y: number): void {
     if (this.target !== undefined) {
-      this.mouse.x = (x / window.innerWidth) * 2 - 1;
-      this.mouse.y = -(y / window.innerHeight) * 2 + 1;
+      const rect = this.domElement.getBoundingClientRect();
+      const cx = ((x - rect.left) / rect.width) * 2 - 1;
+      const cy = -((y - rect.top) / rect.height) * 2 + 1;
+
+      const deltaX = (cx - this.mouse.x) * 10;
+      const deltaY = (cy - this.mouse.y) * 100;
+
+      this.mouse.x = cx;
+      this.mouse.y = cy;
+
+      this.target.rotate(deltaX);
+      this.target.moveVertical(deltaY);
+    }
+  }
+
+  private onLeftDragging(x: number, y: number): void {
+    if (this.target !== undefined) {
+      const rect = this.domElement.getBoundingClientRect();
+      this.mouse.x = ((x - rect.left) / rect.width) * 2 - 1;
+      this.mouse.y = -((y - rect.top) / rect.height) * 2 + 1;
 
       this.raycaster.setFromCamera(this.mouse, this.camera);
       if (this.raycaster.ray.intersectPlane(this.plane, this.intersection)) {
         this.dispatchEvent({ type: "dragging", object: this.target });
-        this.target.position.x = this.intersection.x - this.offset.x;
-        this.target.position.z = this.intersection.z - this.offset.z;
+
+        const x = this.intersection.x - this.offset.x;
+        const z = this.intersection.z - this.offset.z;
+        this.target.moveTo(x, z);
       }
     }
   }
 
-  private onDragEnd(): void {
-    this.dispatchEvent({ type: "deactivate", object: this.target });
-    this.target = undefined;
+  private onEnd(): void {
+    if (this.target !== undefined) {
+      this.dispatchEvent({ type: "deactivate", object: this.target });
+      this.target = undefined;
+      this.type = -1;
+    }
   }
 }

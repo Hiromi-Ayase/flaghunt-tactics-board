@@ -6,6 +6,7 @@ import Board from "./board";
 import Box from "./box";
 import Player from "./player";
 import Drag2DControl from "./drag2d";
+import { Draggable } from "./draggable";
 
 window.addEventListener("DOMContentLoaded", () => {
   const renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -36,40 +37,39 @@ window.addEventListener("DOMContentLoaded", () => {
   stats.setMode(0);
   document.body.appendChild(stats.domElement);
 
-  const controls = new MapControls(camera, renderer.domElement);
-  controls.panSpeed = 1.0;
-  controls.rotateSpeed = 0.3;
-
   const grid = new Board();
   scene.add(grid.object);
 
   let lv = 1;
 
   const gui = new dat.GUI();
-  const sizeFolder = gui.addFolder("Size");
+  const sizeFolder = gui.addFolder("Rotation");
 
-  const draggable: THREE.Object3D[] = [];
+  const draggable: Draggable[] = [];
+  let p = 0;
   for (let i = -2; i <= 3; i++) {
     for (let j = -2; j <= 3; j++) {
       if ((i + j) % 2 != 0) continue;
 
       const box = new Box();
-      box.set(i * 5, j * 5, lv, true);
+      box.set(i * 5, j * 5, lv, false);
       scene.add(box.object);
-      draggable.push(box.object);
+      draggable.push(box);
 
       if (lv == 2) {
         const box = new Box();
-        box.set(i * 5, j * 5, 1, true);
+        box.set(i * 5, j * 5, 1, false);
         scene.add(box.object);
-        draggable.push(box.object);
+        draggable.push(box);
       }
 
-      const player = new Player();
+      const player = new Player(p++, 0);
       player.set(i * 7, j * 7, true);
       scene.add(player.object);
-      draggable.push(player.object);
-      sizeFolder.add(player.object.rotation, "y", 0, Math.PI * 2, 0.1);
+      draggable.push(player);
+      sizeFolder
+        .add(player.object.rotation, "y", 0, Math.PI * 2, 0.1)
+        .name("Player-" + p);
 
       lv = lv == 1 ? 2 : 1;
     }
@@ -90,6 +90,10 @@ window.addEventListener("DOMContentLoaded", () => {
   });
 
   const dc = new Drag2DControl(draggable, camera, renderer.domElement);
+  const controls = new MapControls(camera, renderer.domElement);
+  controls.panSpeed = 1.0;
+  controls.rotateSpeed = 0.3;
+
   dc.addEventListener("activate", () => {
     controls.enabled = false;
   });
