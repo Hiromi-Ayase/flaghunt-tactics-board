@@ -85,10 +85,16 @@ export default class Drag2DControl extends THREE.EventDispatcher {
     this.mouse.y = -((y - rect.top) / rect.height) * 2 + 1;
 
     this.raycaster.setFromCamera(this.mouse, this.camera);
-    const intersections = this.raycaster.intersectObjects(this.objects);
+    const intersections = this.raycaster.intersectObjects(this.objects, true);
 
     if (intersections.length > 0) {
-      this.target = this.map[intersections[0].object.id];
+      let obj = intersections[0].object;
+
+      while (!(obj.id in this.map)) {
+        obj = obj.parent;
+      }
+
+      this.target = this.map[obj.id];
       const position = this.target.getObject().position;
       this.plane.constant = -position.y;
       if (this.raycaster.ray.intersectPlane(this.plane, this.intersection)) {

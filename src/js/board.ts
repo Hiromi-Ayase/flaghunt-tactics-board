@@ -36,7 +36,7 @@ export default class Board {
    * @param width Board width.
    * @param height Board height.
    */
-  constructor(width = 31, height = 21) {
+  constructor(public width = 31, public height = 21) {
     this.object = new THREE.Object3D();
     Board.numberGeometry = new Array(100);
     for (let i = 0; i < 100; i++) {
@@ -53,7 +53,6 @@ export default class Board {
    */
   public setSize(w: number, h: number): void {
     this.object.children = [];
-
     const cellSize = settings.global.cell.size;
     const geometry = Board.geometry;
     const material = Board.material;
@@ -66,6 +65,14 @@ export default class Board {
     const right = (w / 2) * cellSize;
     const width = w * cellSize;
     const height = h * cellSize;
+
+    if (this.width % 2 != w % 2)
+      this.object.position.x += w % 2 == 0 ? cellSize / 4 : -cellSize / 4;
+    if (this.height % 2 != h % 2)
+      this.object.position.z += h % 2 == 0 ? cellSize / 4 : -cellSize / 4;
+
+    this.width = w;
+    this.height = h;
 
     // Create dots.
     for (let i = 0; i <= w; i += 1) {

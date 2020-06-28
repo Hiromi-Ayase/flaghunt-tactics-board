@@ -52,6 +52,7 @@ export default class Player implements Draggable {
     caption.position.x -= settings.player.size * 0.5;
 
     this.object = new THREE.Mesh(Player.geometry, Player.material[team]);
+    this.object.position.y = settings.global.cell.size / 2;
     this.object.add(caption);
   }
 

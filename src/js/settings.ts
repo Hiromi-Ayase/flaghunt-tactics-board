@@ -40,7 +40,7 @@ export const settings = {
     plane: {
       depth: 0.1,
       ground: {
-        color: 0xcccccc,
+        color: 0xffffff,
         width: 1000,
         height: 1000,
       },
