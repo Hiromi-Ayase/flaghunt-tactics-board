@@ -24,13 +24,20 @@ export default class Drag2DControl extends THREE.EventDispatcher {
     document.addEventListener("mouseup", () => this.onDragEnd());
     document.addEventListener("mouseleave", () => this.onDragEnd());
 
-    document.addEventListener("touchstart", (e) =>
-      this.onDragStart(e.changedTouches[0].clientX, e.changedTouches[0].clientX)
-    );
-    document.addEventListener("touchmove", (e) =>
-      this.onDragging(e.changedTouches[0].clientX, e.changedTouches[0].clientY)
-    );
-    document.addEventListener("touchend", () => this.onDragEnd());
+    document.addEventListener("touchstart", (e) => {
+      e.preventDefault();
+      const touch = e.changedTouches[0];
+      this.onDragStart(touch.clientX, touch.clientY);
+    });
+    document.addEventListener("touchmove", (e) => {
+      e.preventDefault();
+      const touch = e.changedTouches[0];
+      this.onDragging(touch.clientX, touch.clientY);
+    });
+    document.addEventListener("touchend", (e) => {
+      e.preventDefault();
+      this.onDragEnd();
+    });
   }
 
   private onDragStart(x: number, y: number): void {
