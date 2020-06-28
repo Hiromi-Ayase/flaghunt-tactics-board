@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import { Draggable } from "./draggable";
+import Draggable from "./draggable";
 
 export default class Drag2DControl extends THREE.EventDispatcher {
   private readonly raycaster = new THREE.Raycaster();
@@ -13,18 +13,11 @@ export default class Drag2DControl extends THREE.EventDispatcher {
   public readonly objects: THREE.Object3D[] = [];
 
   constructor(
-    objects: Draggable[],
     public camera: THREE.Camera,
     public domElement: HTMLCanvasElement,
     public plane = new THREE.Plane(new THREE.Vector3(0, 1, 0))
   ) {
     super();
-
-    for (const v of objects) {
-      const obj = v.getObject();
-      this.objects.push(obj);
-      this.map[obj.id] = v;
-    }
 
     domElement.addEventListener("mousedown", (e) => {
       this.type = e.button == 0 ? 0 : 1;
@@ -42,22 +35,44 @@ export default class Drag2DControl extends THREE.EventDispatcher {
 
     domElement.addEventListener("touchstart", (e) => {
       e.preventDefault();
-      const touch = e.changedTouches[0];
-      this.onStart(touch.clientX, touch.clientY);
+      if (e.touches.length === 1) {
+        const touch = e.changedTouches[0];
+        this.onStart(touch.clientX, touch.clientY);
+      } else {
+        const x = e.touches[0].clientX;
+        const y = e.touches[0].clientY;
+        this.onStart(x, y);
+      }
     });
     domElement.addEventListener("touchmove", (e) => {
       e.preventDefault();
-      const touch = e.changedTouches[0];
       if (e.touches.length === 1) {
+        const touch = e.changedTouches[0];
         this.onLeftDragging(touch.clientX, touch.clientY);
       } else {
-        this.onRightDragging(touch.clientX, touch.clientY);
+        const x = e.touches[0].clientX;
+        const y = e.touches[0].clientY;
+        this.onRightDragging(x, y);
       }
     });
     domElement.addEventListener("touchend", (e) => {
       e.preventDefault();
-      this.onEnd();
+      if (e.touches.length == 0) {
+        this.onEnd();
+      }
     });
+  }
+
+  public add(v: Draggable): void {
+    const obj = v.getObject();
+    this.objects.push(obj);
+    this.map[obj.id] = v;
+  }
+
+  public remove(v: Draggable): void {
+    const obj = v.getObject();
+    this.objects.splice(this.objects.indexOf(obj), 1);
+    delete this.map[obj.id];
   }
 
   private onStart(x: number, y: number): void {
@@ -78,7 +93,7 @@ export default class Drag2DControl extends THREE.EventDispatcher {
       this.plane.constant = -position.y;
       if (this.raycaster.ray.intersectPlane(this.plane, this.intersection)) {
         this.offset.copy(this.intersection).sub(position);
-        this.dispatchEvent({ type: "activate", object: this.target });
+        this.dispatchEvent({ type: "activate" });
       }
     }
   }
@@ -108,7 +123,7 @@ export default class Drag2DControl extends THREE.EventDispatcher {
 
       this.raycaster.setFromCamera(this.mouse, this.camera);
       if (this.raycaster.ray.intersectPlane(this.plane, this.intersection)) {
-        this.dispatchEvent({ type: "dragging", object: this.target });
+        this.dispatchEvent({ type: "dragging" });
 
         const x = this.intersection.x - this.offset.x;
         const z = this.intersection.z - this.offset.z;
@@ -119,7 +134,7 @@ export default class Drag2DControl extends THREE.EventDispatcher {
 
   private onEnd(): void {
     if (this.target !== undefined) {
-      this.dispatchEvent({ type: "deactivate", object: this.target });
+      this.dispatchEvent({ type: "deactivate" });
       this.target = undefined;
       this.type = -1;
     }

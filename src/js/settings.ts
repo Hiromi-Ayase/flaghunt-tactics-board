@@ -5,6 +5,7 @@ export const settings = {
     },
   },
   player: {
+    num: 12,
     color: [0xff0000, 0x0000ff],
     size: 4,
     text: {

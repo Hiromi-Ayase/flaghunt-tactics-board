@@ -1,6 +1,6 @@
 import * as THREE from "three";
 import settings from "./settings";
-import { Draggable } from "./draggable";
+import Draggable from "./draggable";
 
 export default class Box implements Draggable {
   private static geometry = new THREE.BoxGeometry(
@@ -18,6 +18,7 @@ export default class Box implements Draggable {
     this.object = new THREE.Mesh(Box.geometry);
   }
   moveVertical(delta: number): void {
+    if (delta < 0.1) return;
     const cellSize = settings.global.cell.size;
     const level = delta < 0 ? 1 : 2;
     const y = (level - 0.5) * cellSize;
@@ -38,6 +39,7 @@ export default class Box implements Draggable {
     const nz = Math.floor(z / cellSize + 0.5) * cellSize;
     this.object.position.set(nx, this.object.position.y, nz);
   }
+
 
   set(x: number, z: number, level = 1, even = false): void {
     const cellSize = settings.global.cell.size;

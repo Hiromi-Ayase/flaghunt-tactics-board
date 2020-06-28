@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import settings from "./settings";
 import HelvertikerFont from "three/examples/fonts/helvetiker_regular.typeface.json";
-import { Draggable } from "./draggable";
+import Draggable from "./draggable";
 
 export default class Player implements Draggable {
   private static font = new THREE.Font(HelvertikerFont);
@@ -66,15 +66,5 @@ export default class Player implements Draggable {
   }
   getObject(): THREE.Object3D {
     return this.object;
-  }
-
-  set(x: number, z: number, even = false): void {
-    const cellSize = settings.global.cell.size;
-    const offset = even ? -0.5 : 0;
-    const meshX = (x + offset) * cellSize;
-    const meshY = 0.5 * cellSize;
-    const meshZ = (z + offset) * cellSize;
-    this.object.material = Player.material[0];
-    this.object.position.set(meshX, meshY, meshZ);
   }
 }
