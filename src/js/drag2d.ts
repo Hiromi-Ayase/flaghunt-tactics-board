@@ -44,12 +44,11 @@ export default class Drag2DControl extends THREE.EventDispatcher {
       e.preventDefault();
       const touch = e.changedTouches[0];
       this.onStart(touch.clientX, touch.clientY);
-      this.type = e.changedTouches.length == 1 ? 0 : 1;
     });
     domElement.addEventListener("touchmove", (e) => {
       e.preventDefault();
       const touch = e.changedTouches[0];
-      if (this.type === 0) {
+      if (e.touches.length === 1) {
         this.onLeftDragging(touch.clientX, touch.clientY);
       } else {
         this.onRightDragging(touch.clientX, touch.clientY);
