@@ -5,7 +5,7 @@ import Stats from "three/examples/js/libs/stats.min";
 import Board from "./board";
 import Box from "./box";
 import Player from "./player";
-import Drag2DControl from "./draggable";
+import Drag2DControl from "./drag2d";
 
 window.addEventListener("DOMContentLoaded", () => {
   const renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -74,6 +74,21 @@ window.addEventListener("DOMContentLoaded", () => {
       lv = lv == 1 ? 2 : 1;
     }
   }
+
+  window.addEventListener("resize", () => {
+    // サイズを取得
+    const width = window.innerWidth;
+    const height = window.innerHeight;
+
+    // レンダラーのサイズを調整する
+    renderer.setPixelRatio(window.devicePixelRatio);
+    renderer.setSize(width, height);
+
+    // カメラのアスペクト比を正す
+    camera.aspect = width / height;
+    camera.updateProjectionMatrix();
+  });
+
   const dc = new Drag2DControl(draggable, camera, renderer.domElement);
   dc.addEventListener("activate", () => {
     controls.enabled = false;
