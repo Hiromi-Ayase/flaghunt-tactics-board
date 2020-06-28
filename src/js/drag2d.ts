@@ -27,8 +27,8 @@ export default class Drag2DControl extends THREE.EventDispatcher {
     }
 
     domElement.addEventListener("mousedown", (e) => {
-      const type = e.button == 0 ? 0 : 1;
-      this.onStart(type, e.clientX, e.clientY);
+      this.type = e.button == 0 ? 0 : 1;
+      this.onStart(e.clientX, e.clientY);
     });
     domElement.addEventListener("mousemove", (e) => {
       if (this.type === 0) {
@@ -43,12 +43,13 @@ export default class Drag2DControl extends THREE.EventDispatcher {
     domElement.addEventListener("touchstart", (e) => {
       e.preventDefault();
       const touch = e.changedTouches[0];
-      this.onStart(0, touch.clientX, touch.clientY);
+      this.onStart(touch.clientX, touch.clientY);
+      this.type = e.changedTouches.length == 1 ? 0 : 1;
     });
     domElement.addEventListener("touchmove", (e) => {
       e.preventDefault();
       const touch = e.changedTouches[0];
-      if (e.changedTouches.length == 1) {
+      if (this.type === 0) {
         this.onLeftDragging(touch.clientX, touch.clientY);
       } else {
         this.onRightDragging(touch.clientX, touch.clientY);
@@ -60,7 +61,7 @@ export default class Drag2DControl extends THREE.EventDispatcher {
     });
   }
 
-  private onStart(type: number, x: number, y: number): void {
+  private onStart(x: number, y: number): void {
     if (this.target !== undefined) {
       return;
     }
@@ -68,7 +69,6 @@ export default class Drag2DControl extends THREE.EventDispatcher {
     const rect = this.domElement.getBoundingClientRect();
     this.mouse.x = ((x - rect.left) / rect.width) * 2 - 1;
     this.mouse.y = -((y - rect.top) / rect.height) * 2 + 1;
-    this.type = type;
 
     this.raycaster.setFromCamera(this.mouse, this.camera);
     const intersections = this.raycaster.intersectObjects(this.objects);
