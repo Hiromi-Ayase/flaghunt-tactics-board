@@ -15,13 +15,6 @@ export default class Board {
     settings.board.base.unit
   );
 
-  private static fieldCanvas = document.createElement("canvas");
-  private static fieldTexture = new THREE.CanvasTexture(Board.fieldCanvas);
-  private static fieldMaterial = new THREE.MeshStandardMaterial({
-    map: Board.fieldTexture,
-    alphaTest: 1.0,
-  });
-
   private static groundMaterial = new THREE.MeshStandardMaterial({
     color: settings.board.plane.ground.color,
   });
@@ -29,14 +22,21 @@ export default class Board {
   private static font = new THREE.Font(HelvertikerFont);
   private static numberGeometry: THREE.Geometry[];
 
-  public object: THREE.Object3D;
+  public readonly fieldCanvas = document.createElement("canvas");
+  public readonly fieldTexture = new THREE.CanvasTexture(this.fieldCanvas);
+  private readonly fieldMaterial = new THREE.MeshStandardMaterial({
+    map: this.fieldTexture,
+    alphaTest: 1.0,
+  });
+
+  public readonly object: THREE.Object3D;
 
   /**
    * Constructor.
    * @param width Board width.
    * @param height Board height.
    */
-  constructor(public width = 31, public height = 21) {
+  constructor(width = 31, height = 21) {
     this.object = new THREE.Object3D();
     Board.numberGeometry = new Array(100);
     for (let i = 0; i < 100; i++) {
@@ -65,14 +65,6 @@ export default class Board {
     const right = (w / 2) * cellSize;
     const width = w * cellSize;
     const height = h * cellSize;
-
-    if (this.width % 2 != w % 2)
-      this.object.position.x += w % 2 == 0 ? cellSize / 4 : -cellSize / 4;
-    if (this.height % 2 != h % 2)
-      this.object.position.z += h % 2 == 0 ? cellSize / 4 : -cellSize / 4;
-
-    this.width = w;
-    this.height = h;
 
     // Create dots.
     for (let i = 0; i <= w; i += 1) {
@@ -106,7 +98,7 @@ export default class Board {
     this.object.add(rightLineMesh);
 
     // Create planes.
-    const fieldMesh = new THREE.Mesh(geometry, Board.fieldMaterial);
+    const fieldMesh = new THREE.Mesh(geometry, this.fieldMaterial);
     fieldMesh.scale.set(width, depth, height);
     fieldMesh.position.set(0, 0, 0);
 
@@ -139,16 +131,6 @@ export default class Board {
       );
       this.object.add(numberMesh);
     }
-
-    const ctx = Board.fieldCanvas.getContext("2d");
-    const f = settings.board.plane.field.canvas.factor * cellSize;
-    Board.fieldCanvas.width = w * f;
-    Board.fieldCanvas.height = h * f;
-    ctx.fillStyle = "#FFFFFF";
-    ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-    ctx.fillStyle = "rgba(255, 0, 0, 0.5)";
-    ctx.fillRect(0, 0, f * 10, f * 10);
-    ctx.fillRect(4 * f, 4 * f, 14 * f, 14 * f);
   }
 
   private createTextGeometry(text: string): THREE.TextGeometry {

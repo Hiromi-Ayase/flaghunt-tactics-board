@@ -6,16 +6,16 @@ export const settings = {
   },
   player: {
     num: 12,
-    color: [0xff0000, 0x0000ff],
-    size: 4,
+    color: [0x0000ff, 0xff0000],
+    size: 3,
     text: {
-      size: 4,
+      size: 3,
       depth: 0.1,
     },
   },
   box: {
     size: 9.7,
-    color: [0xffcc66, 0xccaa33],
+    color: [0xffcc66, 0x66ccff],
     edge: {
       color: 0x000000,
     },

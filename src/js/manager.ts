@@ -36,7 +36,7 @@ export default class Manager {
   public state: State = {
     board: {
       width: 31,
-      height: 20,
+      height: 21,
     },
     players: {},
     boxes: {},
@@ -52,25 +52,27 @@ export default class Manager {
 
     for (let team = 0; team < 2; team++) {
       for (let i = 0; i < settings.player.num; i++) {
-        const id = "player" + (i + 1);
+        const id = "player-" + team + "-" + (i + 1);
         state.players[id] = {
-          x: 25 * i,
-          y: 2,
+          x: -80 + 20 * i,
+          y: -135 + 15 * team,
           num: i,
           team: team,
           angle: 120,
-          dir: team == 0 ? 0 : 180,
+          dir: team == 0 ? 0 : Math.PI,
         };
       }
     }
 
-    for (let i = 1; i < 10; i++) {
-      const id = "box-" + i;
-      state.boxes[id] = {
-        x: 10 * i,
-        y: 2,
-        level: 1,
-      };
+    for (let j = 1; j <= 2; j++) {
+      for (let i = 0; i < 150; i++) {
+        const id = "box-" + j + "-" + i;
+        state.boxes[id] = {
+          x: -150 + 10 * (i % 30),
+          y: 150 + Math.floor(i / 30) * 10,
+          level: j,
+        };
+      }
     }
     this.render();
   }
@@ -80,6 +82,10 @@ export default class Manager {
     const scene = this.scene;
     const drag2d = this.drag2d;
     this.board.setSize(state.board.width, state.board.height);
+    this.board.object.position.x =
+      state.board.width % 2 == 0 ? settings.global.cell.size / 2 : 0;
+    this.board.object.position.z =
+      state.board.height % 2 == 0 ? settings.global.cell.size / 2 : 0;
 
     const objectIds = new Set<string>();
     for (const object of this.scene.children) {
@@ -97,6 +103,7 @@ export default class Manager {
       if (!(id in this.boxes)) {
         this.boxes[id] = new Box(this);
         this.boxes[id].object.name = id;
+
         scene.add(this.boxes[id].object);
         drag2d.add(this.boxes[id]);
       } else {
@@ -110,7 +117,7 @@ export default class Manager {
     for (const id in state.players) {
       const s = state.players[id];
       if (!(id in this.players)) {
-        this.players[id] = new Player(s.num, s.team);
+        this.players[id] = new Player(s.num, s.team, this);
         this.players[id].object.name = id;
         scene.add(this.players[id].object);
         drag2d.add(this.players[id]);
@@ -119,17 +126,46 @@ export default class Manager {
       }
       const player = this.players[id];
       player.moveTo(s.x, s.y);
+      player.object.children[0].rotation.y = s.dir;
+    }
+    this.renderView();
+  }
+
+  public renderView(): void {
+    const ctx = this.board.fieldCanvas.getContext("2d");
+    this.board.fieldTexture.needsUpdate = true;
+    const state = this.state;
+    const cellSize = settings.global.cell.size;
+    const bh = cellSize * state.board.height;
+    const bw = cellSize * state.board.width;
+
+    ctx.canvas.width = bw;
+    ctx.canvas.height = bh;
+    const ch = ctx.canvas.height;
+    const cw = ctx.canvas.width;
+    ctx.clearRect(0, 0, cw, ch);
+
+    const offsetX =
+      (state.board.width * cellSize + (state.board.height % 2 == 0 ? 1 : 0)) /
+      2;
+    const offsetY =
+      (state.board.height * cellSize + (state.board.width % 2 == 0 ? 1 : 0)) /
+      2;
+
+    for (const boxId in this.boxes) {
+      const rx = this.boxes[boxId].object.position.x;
+      const ry = this.boxes[boxId].object.position.z;
+
+      const x = ((rx + offsetX) / bw) * cw;
+      const y = ((ry + offsetY) / bh) * ch;
+
+      if (x < 0 || x >= cw || y < 0 || y >= ch) continue;
+
+      ctx.fillStyle = "rgb(0, 0, 255)";
+      ctx.fillRect(x, y, 10, 10);
+      console.log(x + " " + y + " " + cw + " " + ch);
+    }
+    for (const playerId in this.players) {
     }
   }
-  // set(x: number, z: number, even = false): void {
-  //   const cellSize = settings.global.cell.size;
-  //   const offset = even ? -0.5 : 0;
-  //   const meshX = (x + offset) * cellSize;
-  //   const meshY = 0.5 * cellSize;
-  //   const meshZ = (z + offset) * cellSize;
-  //   this.object.material = Player.material[0];
-  //   this.object.position.set(meshX, meshY, meshZ);
-  // }
-
-  // private floor(v: number): void { }
 }

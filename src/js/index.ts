@@ -9,19 +9,13 @@ import Draggable from "./draggable";
 
 window.addEventListener("DOMContentLoaded", () => {
   const renderer = new THREE.WebGLRenderer({ antialias: true });
+
   renderer.setSize(window.innerWidth, window.innerHeight);
   renderer.setPixelRatio(window.devicePixelRatio);
   document.body.appendChild(renderer.domElement);
 
   const scene = new THREE.Scene();
   scene.background = new THREE.Color(0xcccccc);
-
-  const light = new THREE.DirectionalLight(0xffffff, 1.3);
-  light.position.set(0, 1, 1);
-  scene.add(light);
-
-  const light2 = new THREE.AmbientLight(0xffffff, 0.2);
-  scene.add(light2);
 
   const camera = new THREE.PerspectiveCamera(
     45,
@@ -31,6 +25,10 @@ window.addEventListener("DOMContentLoaded", () => {
   );
   camera.position.set(0, 400, 0);
   camera.lookAt(0, 0, 0);
+
+  const light = new THREE.DirectionalLight(0xffffff, 1.5);
+  light.position.set(50, 100, 50);
+  scene.add(light);
 
   const stats = new Stats();
   stats.setMode(0);
@@ -49,10 +47,10 @@ window.addEventListener("DOMContentLoaded", () => {
 
   const gui = new dat.GUI();
   const folder = gui.addFolder("Board");
-  folder.add(manager.state.board, "width", 10, 100, 1).onChange(() => {
+  folder.add(manager.state.board, "width", 10, 50, 1).onChange(() => {
     manager.render();
   });
-  folder.add(manager.state.board, "height", 10, 100, 1).onChange(() => {
+  folder.add(manager.state.board, "height", 10, 50, 1).onChange(() => {
     manager.render();
   });
 

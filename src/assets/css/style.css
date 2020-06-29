@@ -6,22 +6,10 @@ body {
 	font-size: 13px;
 	line-height: 24px;
 	overscroll-behavior: none;
+
+	touch-action: manipulation;
 }
 
 canvas {
 	display: block;
-}
-
-#info {
-	position: absolute;
-	top: 10px;
-	width: 100%;
-	text-align: center;
-	z-index: 100;
-	display:block;
-}
-
-#info input {
-	background-color:transparent;
-	border: 1px solid;
 }

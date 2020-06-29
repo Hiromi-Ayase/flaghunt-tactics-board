@@ -2,6 +2,7 @@ import * as THREE from "three";
 import settings from "./settings";
 import HelvertikerFont from "three/examples/fonts/helvetiker_regular.typeface.json";
 import Draggable from "./draggable";
+import Manager from "./manager";
 
 export default class Player implements Draggable {
   private static font = new THREE.Font(HelvertikerFont);
@@ -43,7 +44,7 @@ export default class Player implements Draggable {
 
   object: THREE.Mesh;
 
-  constructor(num: number, team: number) {
+  constructor(num: number, team: number, public manager: Manager) {
     const caption = new THREE.Mesh(
       Player.captionGeometry[num],
       Player.material[team]
@@ -51,8 +52,11 @@ export default class Player implements Draggable {
     caption.position.z -= settings.player.size * 1.7;
     caption.position.x -= settings.player.size * 0.5;
 
-    this.object = new THREE.Mesh(Player.geometry, Player.material[team]);
+    const player = new THREE.Mesh(Player.geometry, Player.material[team]);
+
+    this.object = new THREE.Mesh();
     this.object.position.y = settings.global.cell.size / 2;
+    this.object.add(player);
     this.object.add(caption);
   }
 
@@ -60,9 +64,13 @@ export default class Player implements Draggable {
     // none.
   }
   rotate(delta: number): void {
-    this.object.rotateY(delta);
+    this.object.children[0].rotateY(delta);
+    this.manager.state.players[this.object.name].dir = this.object.rotation.y;
   }
+
   moveTo(x: number, z: number): void {
+    this.manager.state.players[this.object.name].x = x;
+    this.manager.state.players[this.object.name].y = z;
     this.object.position.set(x, this.object.position.y, z);
   }
   getObject(): THREE.Object3D {

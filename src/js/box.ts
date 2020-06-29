@@ -13,7 +13,7 @@ export default class Box implements Draggable {
     new THREE.MeshStandardMaterial({ color: settings.box.color[0] }),
     new THREE.MeshStandardMaterial({ color: settings.box.color[1] }),
   ];
-  object: THREE.Mesh;
+  public readonly object: THREE.Mesh;
 
   constructor(private manager: Manager) {
     this.object = new THREE.Mesh(Box.geometry);
@@ -37,6 +37,8 @@ export default class Box implements Draggable {
         return;
       }
     }
+    this.manager.state.boxes[this.object.name].level = level;
+
     this.object.material = Box.material[level - 1];
     this.object.position.set(pos.x, y, pos.z);
   }
@@ -64,6 +66,14 @@ export default class Box implements Draggable {
         return;
       }
     }
+
+    if (this.object.position.x === nx && this.object.position.z === nz) {
+      return;
+    }
+
+    this.manager.state.boxes[this.object.name].x = nx;
+    this.manager.state.boxes[this.object.name].y = nz;
+
     this.object.position.set(nx, this.object.position.y, nz);
   }
 }
