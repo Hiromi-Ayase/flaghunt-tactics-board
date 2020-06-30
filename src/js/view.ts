@@ -31,11 +31,11 @@ export default class View {
   public data: number[] = new Array(settings.global.resolution);
 
   constructor(public team: number) {
-    View.material[team].depthTest = false;
-    View.material[team].alphaTest = 0.1;
     this.object = new THREE.Mesh(this.geometry, View.material[team]);
+    View.material[team].depthTest = false;;
     this.object.rotateX(Math.PI / 2);
-    this.object.renderOrder = View.count;
+
+    this.object.renderOrder = 0;
     View.count++;
   }
 

@@ -38,8 +38,14 @@ export default class Player implements Draggable {
   })();
 
   private static material = [
-    new THREE.MeshStandardMaterial({ color: settings.player.color[0] }),
-    new THREE.MeshStandardMaterial({ color: settings.player.color[1] }),
+    new THREE.MeshStandardMaterial({
+      color: settings.player.color[0],
+      transparent: true,
+    }),
+    new THREE.MeshStandardMaterial({
+      color: settings.player.color[1],
+      transparent: true,
+    }),
   ];
 
   object: THREE.Mesh;
@@ -59,6 +65,8 @@ export default class Player implements Draggable {
     this.object.position.y = settings.global.cell.size / 2;
     this.object.add(player);
     this.object.add(caption);
+    caption.renderOrder = 1000;
+    player.renderOrder = 1000;
   }
 
   moveVertical(): void {
@@ -68,7 +76,7 @@ export default class Player implements Draggable {
     this.object.children[0].rotateY(delta);
     this.manager.state.players[this.object.name].dir = this.object.rotation.y;
 
-    const dir = this.object.children[0].quaternion.y / Math.PI * 180;
+    const dir = (this.object.children[0].quaternion.y / Math.PI) * 180;
     this.manager.state.players[this.object.name].dir = dir;
     this.manager.renderView();
   }

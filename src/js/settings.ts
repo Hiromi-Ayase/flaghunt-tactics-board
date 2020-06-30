@@ -31,7 +31,7 @@ export const settings = {
     color: [0xff0000, 0x0000ff],
   },
   view: {
-    opacity: 0.2,
+    opacity: 0.1,
   },
   board: {
     base: {

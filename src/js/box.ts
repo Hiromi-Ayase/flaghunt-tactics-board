@@ -10,14 +10,21 @@ export default class Box implements Draggable {
     settings.box.size
   );
   private static material = [
-    new THREE.MeshStandardMaterial({ color: settings.box.color[0] }),
-    new THREE.MeshStandardMaterial({ color: settings.box.color[1] }),
+    new THREE.MeshStandardMaterial({
+      color: settings.box.color[0],
+      transparent: true,
+    }),
+    new THREE.MeshStandardMaterial({
+      color: settings.box.color[1],
+      transparent: true,
+    }),
   ];
   public readonly object: THREE.Mesh;
 
   constructor(private manager: Manager) {
     this.object = new THREE.Mesh(Box.geometry);
     this.object.castShadow = true;
+    this.object.renderOrder = 1000;
   }
   moveVertical(delta: number): void {
     if (Math.abs(delta) < 0.3) return;
