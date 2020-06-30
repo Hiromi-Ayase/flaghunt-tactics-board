@@ -66,12 +66,14 @@ export default class Player implements Draggable {
   rotate(delta: number): void {
     this.object.children[0].rotateY(delta);
     this.manager.state.players[this.object.name].dir = this.object.rotation.y;
+    this.manager.renderView();
   }
 
   moveTo(x: number, z: number): void {
     this.manager.state.players[this.object.name].x = x;
     this.manager.state.players[this.object.name].y = z;
     this.object.position.set(x, this.object.position.y, z);
+    this.manager.renderView();
   }
   getObject(): THREE.Object3D {
     return this.object;

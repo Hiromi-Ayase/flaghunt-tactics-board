@@ -17,6 +17,7 @@ export default class Box implements Draggable {
 
   constructor(private manager: Manager) {
     this.object = new THREE.Mesh(Box.geometry);
+    this.object.castShadow = true;
   }
   moveVertical(delta: number): void {
     if (Math.abs(delta) < 0.3) return;
@@ -38,6 +39,7 @@ export default class Box implements Draggable {
       }
     }
     this.manager.state.boxes[this.object.name].level = level;
+    this.manager.renderView();
 
     this.object.material = Box.material[level - 1];
     this.object.position.set(pos.x, y, pos.z);
@@ -73,7 +75,7 @@ export default class Box implements Draggable {
 
     this.manager.state.boxes[this.object.name].x = nx;
     this.manager.state.boxes[this.object.name].y = nz;
-
     this.object.position.set(nx, this.object.position.y, nz);
+    this.manager.renderView();
   }
 }

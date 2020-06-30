@@ -38,6 +38,9 @@ export default class Board {
    */
   constructor(width = 31, height = 21) {
     this.object = new THREE.Object3D();
+    this.fieldCanvas.width = 4096;
+    this.fieldCanvas.height = 4096;
+
     Board.numberGeometry = new Array(100);
     for (let i = 0; i < 100; i++) {
       const space = i < 10 ? "  " : "";
@@ -98,14 +101,19 @@ export default class Board {
     this.object.add(rightLineMesh);
 
     // Create planes.
-    const fieldMesh = new THREE.Mesh(geometry, this.fieldMaterial);
+    const material2 = new THREE.MeshStandardMaterial({
+      color: 0x666666,
+    });
+    const fieldMesh = new THREE.Mesh(geometry, material2);
     fieldMesh.scale.set(width, depth, height);
     fieldMesh.position.set(0, 0, 0);
+    fieldMesh.receiveShadow = true;
 
     const groundMesh = new THREE.Mesh(geometry, Board.groundMaterial);
     const groundSettings = settings.board.plane.ground;
     groundMesh.scale.set(groundSettings.width, depth, groundSettings.height);
     groundMesh.position.set(0, -depth / 2, 0);
+    groundMesh.receiveShadow = true;
 
     this.object.add(fieldMesh);
     this.object.add(groundMesh);
@@ -131,6 +139,16 @@ export default class Board {
       );
       this.object.add(numberMesh);
     }
+
+    // const ctx = this.fieldCanvas.getContext("2d");
+    // const f = settings.board.plane.field.canvas.factor * cellSize;
+    // this.fieldCanvas.width = w * f;
+    // this.fieldCanvas.height = h * f;
+    // ctx.fillStyle = "#FFFFFF";
+    // ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+    // ctx.fillStyle = "rgba(255, 0, 0, 0.5)";
+    // ctx.fillRect(0, 0, f * 10, f * 10);
+    // ctx.fillRect(4 * f, 4 * f, 14 * f, 14 * f);
   }
 
   private createTextGeometry(text: string): THREE.TextGeometry {

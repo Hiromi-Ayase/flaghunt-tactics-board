@@ -9,6 +9,7 @@ import Draggable from "./draggable";
 
 window.addEventListener("DOMContentLoaded", () => {
   const renderer = new THREE.WebGLRenderer({ antialias: true });
+  renderer.shadowMap.enabled = true;
 
   renderer.setSize(window.innerWidth, window.innerHeight);
   renderer.setPixelRatio(window.devicePixelRatio);
@@ -26,8 +27,10 @@ window.addEventListener("DOMContentLoaded", () => {
   camera.position.set(0, 400, 0);
   camera.lookAt(0, 0, 0);
 
-  const light = new THREE.DirectionalLight(0xffffff, 1.5);
-  light.position.set(50, 100, 50);
+  //  const light = new THREE.DirectionalLight(0xffffff, 1.5);
+  const light = new THREE.SpotLight(0xffffff, 1.5);
+  light.position.set(5, 200, 5);
+  light.castShadow = true;
   scene.add(light);
 
   const stats = new Stats();
@@ -47,10 +50,10 @@ window.addEventListener("DOMContentLoaded", () => {
 
   const gui = new dat.GUI();
   const folder = gui.addFolder("Board");
-  folder.add(manager.state.board, "width", 10, 50, 1).onChange(() => {
+  folder.add(manager.state.board, "width", 10, 40, 1).onChange(() => {
     manager.render();
   });
-  folder.add(manager.state.board, "height", 10, 50, 1).onChange(() => {
+  folder.add(manager.state.board, "height", 10, 40, 1).onChange(() => {
     manager.render();
   });
 
