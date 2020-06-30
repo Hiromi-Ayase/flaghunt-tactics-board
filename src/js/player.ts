@@ -55,6 +55,7 @@ export default class Player implements Draggable {
     const player = new THREE.Mesh(Player.geometry, Player.material[team]);
 
     this.object = new THREE.Mesh();
+    player.castShadow = true;
     this.object.position.y = settings.global.cell.size / 2;
     this.object.add(player);
     this.object.add(caption);
@@ -66,6 +67,9 @@ export default class Player implements Draggable {
   rotate(delta: number): void {
     this.object.children[0].rotateY(delta);
     this.manager.state.players[this.object.name].dir = this.object.rotation.y;
+
+    const dir = this.object.children[0].quaternion.y / Math.PI * 180;
+    this.manager.state.players[this.object.name].dir = dir;
     this.manager.renderView();
   }
 

@@ -22,11 +22,8 @@ export default class Board {
   private static font = new THREE.Font(HelvertikerFont);
   private static numberGeometry: THREE.Geometry[];
 
-  public readonly fieldCanvas = document.createElement("canvas");
-  public readonly fieldTexture = new THREE.CanvasTexture(this.fieldCanvas);
-  private readonly fieldMaterial = new THREE.MeshStandardMaterial({
-    map: this.fieldTexture,
-    alphaTest: 1.0,
+  private static fieldMaterial = new THREE.MeshStandardMaterial({
+    color: 0xffffff,
   });
 
   public readonly object: THREE.Object3D;
@@ -38,8 +35,6 @@ export default class Board {
    */
   constructor(width = 31, height = 21) {
     this.object = new THREE.Object3D();
-    this.fieldCanvas.width = 4096;
-    this.fieldCanvas.height = 4096;
 
     Board.numberGeometry = new Array(100);
     for (let i = 0; i < 100; i++) {
@@ -101,10 +96,7 @@ export default class Board {
     this.object.add(rightLineMesh);
 
     // Create planes.
-    const material2 = new THREE.MeshStandardMaterial({
-      color: 0x666666,
-    });
-    const fieldMesh = new THREE.Mesh(geometry, material2);
+    const fieldMesh = new THREE.Mesh(geometry, Board.fieldMaterial);
     fieldMesh.scale.set(width, depth, height);
     fieldMesh.position.set(0, 0, 0);
     fieldMesh.receiveShadow = true;

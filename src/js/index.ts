@@ -27,9 +27,17 @@ window.addEventListener("DOMContentLoaded", () => {
   camera.position.set(0, 400, 0);
   camera.lookAt(0, 0, 0);
 
-  //  const light = new THREE.DirectionalLight(0xffffff, 1.5);
-  const light = new THREE.SpotLight(0xffffff, 1.5);
-  light.position.set(5, 200, 5);
+  const ambLight = new THREE.AmbientLight(0xffffff, 0.4);
+  scene.add(ambLight);
+  const light = new THREE.DirectionalLight(0xffffff, 1.0);
+  light.position.set(0, 100, 0);
+  light.shadow.mapSize.height = 4096;
+  light.shadow.mapSize.width = 4096;
+  light.shadow.camera.right = 500;
+  light.shadow.camera.left = -500;
+  light.shadow.camera.top = -500;
+  light.shadow.camera.bottom = 500;
+
   light.castShadow = true;
   scene.add(light);
 
@@ -65,6 +73,7 @@ window.addEventListener("DOMContentLoaded", () => {
     console.log(object);
     object.position.set(-150, 10, -130);
     object.scale.setScalar(0.05);
+    object.rotateX(-Math.PI / 4);
     scene.add(object);
 
     class Logo implements Draggable {
@@ -85,21 +94,37 @@ window.addEventListener("DOMContentLoaded", () => {
     ctl.add(new Logo());
   });
 
+  // {
+  //   const mat = new THREE.MeshBasicMaterial({
+  //     color: 0xff0000,
+  //     transparent: true,
+  //     opacity: 0.5,
+  //   });
+
+  //   const geolist: THREE.Geometry[] = [];
+  //   for (let i = 0; i < 24000; i++) {
+  //     const geo = new THREE.Geometry();
+  //     geo.vertices.push(new THREE.Vector3(100 + i, 100, 0));
+  //     geo.vertices.push(new THREE.Vector3(100, 100, 100));
+  //     geo.vertices.push(new THREE.Vector3(0, 100, 100));
+  //     geo.faces.push(new THREE.Face3(0, 2, 1));
+  //     geolist.push(geo);
+
+  //     const mesh = new THREE.Mesh(geo, mat);
+  //     mesh.position.set(i * 10, 40, i * 10);
+  //     scene.add(mesh);
+  //   }
+  // }
+
   window.addEventListener("resize", () => {
-    // サイズを取得
     const width = window.innerWidth;
     const height = window.innerHeight;
-
-    // レンダラーのサイズを調整する
     renderer.setPixelRatio(window.devicePixelRatio);
     renderer.setSize(width, height);
-
-    // カメラのアスペクト比を正す
     camera.aspect = width / height;
     camera.updateProjectionMatrix();
   });
 
-  // const dc = new Drag2DControl(draggable, camera, renderer.domElement);
   const controls = new MapControls(camera, renderer.domElement);
   controls.panSpeed = 1.0;
   controls.rotateSpeed = 0.3;
@@ -113,5 +138,5 @@ window.addEventListener("DOMContentLoaded", () => {
 
   tick();
 
-  console.log("Hello Three.js");
+  console.log("Hello JFA !");
 });

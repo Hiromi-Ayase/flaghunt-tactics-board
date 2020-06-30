@@ -3,6 +3,13 @@ export const settings = {
     cell: {
       size: 10,
     },
+    border: {
+      top: -1000,
+      bottom: 1000,
+      left: -1000,
+      right: -1000,
+    },
+    resolution: 1000,
   },
   player: {
     num: 12,
@@ -22,6 +29,9 @@ export const settings = {
   },
   fog: {
     color: [0xff0000, 0x0000ff],
+  },
+  view: {
+    opacity: 0.2,
   },
   board: {
     base: {
